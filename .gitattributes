@@ -1,0 +1,2 @@
+dist/Vortex.exe filter=lfs diff=lfs merge=lfs -text
+build/Vortex/Vortex.pkg filter=lfs diff=lfs merge=lfs -text
