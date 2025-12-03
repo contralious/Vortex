@@ -1,5 +1,5 @@
 HOW TO DOWNLOAD?
-Click on dist, then on Vortex.exe, it will put you on a "this file is too big" page. click the 3 dots, and click download. or just press ctrl + shift + s if you cant find it. (sorry for it being messy, first time using github.)
+Go to releases, then the latest one, then click on the exe, it should start downloading. (Source code is there aswell)
 
 HOW TO USE?
 make sure you crop thermodynamics EXACTLY as shown as in video. its possible for it to fail.
@@ -7,3 +7,6 @@ https://files.catbox.moe/rpk1ic.mp4
 
 Why is it 451MB?
 It uses tesseract OCR, which takes up a lot of space (i need to pack it into the program so it works for everyone with a single download)
+
+
+MADE BY @C_tra on discord.
