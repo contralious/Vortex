@@ -1,3 +1,4 @@
+DISCLAIMER: THIS MAY OR MAY NOT BE ALWAYS ACCURATE, YOURE PREDICTING A DICEROLL.
 HOW TO DOWNLOAD?
 Go to releases, then the latest one, then click on the exe, it should start downloading. (Source code is there aswell)
 
