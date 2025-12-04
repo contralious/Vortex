@@ -373,7 +373,7 @@
             return "";
         };
 
-        let rawPwat = find(["PWAT"]);
+        let rawPwat = find(["PWAT", "PHAT"]);
         // Fix pwat
         if (rawPwat.startsWith("17.")) rawPwat = "1." + rawPwat.substring(3);
         if (/^7\.\d+$/.test(rawPwat)) rawPwat = "1" + rawPwat.substring(1);
