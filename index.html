@@ -213,7 +213,7 @@
             <button class="btn" onclick="calculate()">CALCULATE</button>
         </div>
 
-        <!-- STEP 4: RESULTS -->        <div id="step-results" class="hidden">
+        <div id="step-results" class="hidden">
             <div style="display:flex; justify-content:space-between; align-items:center;">
                 <span style="font-weight:bold; font-size:10px; color:var(--subtext)">INTENSITY</span>
                 <div>
@@ -286,7 +286,7 @@
                 y: Math.random() * height,
                 size: Math.random() * 2,
                 alpha: Math.random(),
-                speed: (Math.random() * 0.02 + 0.005) * (Math.random() > 0.5 ? 1 : -1)
+                speed: (Math.random() * 0.005 + 0.001) * (Math.random() > 0.5 ? 1 : -1)
             });
         }
     }
