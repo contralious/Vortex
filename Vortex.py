@@ -1,3 +1,4 @@
+# Copyright (c) 2025 contralious on GitHub and @c_tra on Discord. All rights reserved.
 import customtkinter as ctk
 import tkinter as tk
 from tkinter import messagebox
