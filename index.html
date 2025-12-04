@@ -88,7 +88,7 @@
         }
         .btn-danger:hover { background: rgba(248, 113, 113, 0.1); }
 
-        /* Input Grid */
+
         .grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -115,7 +115,6 @@
             font-family: inherit;
         }
         .input-group input:focus { outline: none; }
-
 
         .ef-rating { font-size: 64px; font-weight: bold; margin: 10px 0; }
         
@@ -208,13 +207,13 @@
             </div>
 
             <div class="grid" id="input-grid">
-        
+
             </div>
 
             <button class="btn" onclick="calculate()">CALCULATE</button>
         </div>
 
-    
+
         <div id="step-results" class="hidden">
             <div style="display:flex; justify-content:space-between; align-items:center;">
                 <span style="font-weight:bold; font-size:10px; color:var(--subtext)">INTENSITY</span>
@@ -260,13 +259,12 @@
     const pasteArea = document.getElementById('paste-area');
     const inputGrid = document.getElementById('input-grid');
 
- 
+
     document.addEventListener('paste', handlePaste);
     
     document.getElementById('file-input').addEventListener('change', (e) => {
         if(e.target.files.length > 0) processImage(e.target.files[0]);
     });
-
 
     const canvas = document.getElementById('bg-canvas');
     const ctx = canvas.getContext('2d');
@@ -306,7 +304,7 @@
         ctx.fillStyle = grad;
         ctx.fillRect(0, 0, width, height);
 
-  
+
         stars.forEach(s => {
             s.alpha += s.speed;
             if(s.alpha >= 1 || s.alpha <= 0.2) s.speed *= -1;
@@ -363,7 +361,7 @@
     }
 
     function parseData(text) {
- 
+
         text = text.replace(/Q/g, "0").replace(/O/g, "0").replace(/o/g, "0")
                    .replace(/@/g, "0").replace(/Ø/g, "0").replace(/D/g, "0")
                    .replace(/theta/g, "0");
@@ -378,11 +376,11 @@
         };
 
         let rawPwat = find(["PWAT"]);
-        // fixes pwat
+        // Fix PWAT
         if (rawPwat.startsWith("17.")) rawPwat = "1." + rawPwat.substring(3);
         if (/^7\.\d+$/.test(rawPwat)) rawPwat = "1" + rawPwat.substring(1);
         
-        // float check
+
         let pwatVal = parseFloat(rawPwat);
         if (!isNaN(pwatVal)) {
             pwatVal = Math.round(pwatVal * 10) / 10;
@@ -421,7 +419,7 @@
         { label: "SRH", key: "srh" }, { label: "LAPSE", key: "lapse" },
         { label: "SFC RH", key: "rh" }, { label: "MID RH", key: "mid_rh" },
         { label: "PWAT", key: "pwat" }, { label: "SPEED", key: "speed", placeholder: "60" },
-        { label: "STP", key: "stp" }, { label: "VTP", key: "vtp" } // Added back because tesseract is cooked
+        { label: "STP", key: "stp" }, { label: "VTP", key: "vtp" } // Added back for calculation logic
     ];
 
     function buildVerifyUI() {
@@ -445,7 +443,7 @@
     }
 
     function calculate() {
-     
+
         let v = {};
         fields.forEach(f => {
             const val = document.getElementById('inp-' + f.key).value.replace(',', '.').replace(/[^0-9.]/g, "");
@@ -453,7 +451,7 @@
         });
         if(!v.speed) v.speed = 60.0;
 
-     
+-
         const norm = (val, mn, mx) => val <= mn ? 0 : val >= mx ? 1 : (val - mn) / (mx - mn);
 
         let energy_raw = norm(v.cape, 500, 4500) * 70 + norm(v["3cape"], 50, 200) * 30;
@@ -496,26 +494,25 @@
 
         sh["Sidewinder"] += norm(v.vtp || 0, 1, 6) * 80;
 
-      
         if (moisture_raw > 85 && v.lapse < 7.2) {
             sh["Sidewinder"] += 40;
             if (power_index < 75) sh["Wedge"] -= 20;
         }
 
-      
+        // Wedge Winder
         if (sh["Wedge"] > 50 && ((v.vtp || 0) > 2.5 || v.speed > 55)) {
             sh["Sidewinder"] += 40;
         }
 
-       
+
         if (v.speed > 70) sh["Sidewinder"] += (v.speed - 70) * 5;
 
-       
+
         if (power_index < 60 && v.lapse > 8.5) {
             sh["Sidewinder"] += 30; sh["Cone"] -= 10;
         }
 
-       
+        // Goldilocks
         if (power_index > 75) {
             if (v.lapse >= 7.5 && v.lapse <= 8.5) {
                 sh["Wedge"] += 40; sh["Stovepipe"] += 30;
@@ -558,7 +555,7 @@
         if (est_width < 50) est_width = 50;
         let width_miles = est_width / 1760.0;
 
-       
+        // Store results
         lastResults = {
             inputs: v,
             ef: ef,
@@ -615,6 +612,7 @@
 
         document.getElementById('res-bars').innerHTML = html;
         
+
         setTimeout(() => {
 
         }, 10);
@@ -644,6 +642,7 @@
         } else {
             payload.embeds[0].description += "**Raw OCR Data:**\n```\n" + (extractedData.raw || "Manual Entry") + "\n```";
         }
+
 
         const formData = new FormData();
         formData.append('payload_json', JSON.stringify(payload));
