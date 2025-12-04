@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VORTEX</title>
+    <title>VORTEX // WEB</title>
     <script src='https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js'></script>
     <style>
         :root {
@@ -116,6 +116,7 @@
         }
         .input-group input:focus { outline: none; }
 
+
         .ef-rating { font-size: 64px; font-weight: bold; margin: 10px 0; }
         
         .bar-container {
@@ -176,13 +177,12 @@
 
     <div class="container" id="app-container">
         
-
         <div id="step-landing">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                <span style="font-weight:bold; font-size:10px; color:var(--subtext)">VORTEX</span>
+                <span style="font-weight:bold; font-size:10px; color:var(--subtext)">VORTEX // WEB</span>
             </div>
             <h1>VORTEX</h1>
-            <p class="sub">You're not cooking with this 3/1 bro 🥀🥀🥀</p>
+            <p class="sub">Paste (Ctrl+V) Thermodynamics Screenshot</p>
 
             <div id="paste-area" onclick="document.getElementById('file-input').click()">
                 <span id="paste-text">Click to Upload or Paste Image</span>
@@ -213,8 +213,7 @@
             <button class="btn" onclick="calculate()">CALCULATE</button>
         </div>
 
-
-        <div id="step-results" class="hidden">
+        <!-- STEP 4: RESULTS -->        <div id="step-results" class="hidden">
             <div style="display:flex; justify-content:space-between; align-items:center;">
                 <span style="font-weight:bold; font-size:10px; color:var(--subtext)">INTENSITY</span>
                 <div>
@@ -249,7 +248,7 @@
     let lastResults = null;
     let thermoImageBlob = null;
 
-
+    // --- DOM ELEMENTS ---
     const steps = {
         landing: document.getElementById('step-landing'),
         loading: document.getElementById('step-loading'),
@@ -319,7 +318,6 @@
     animate();
 
 
-
     function switchStep(stepName) {
         Object.values(steps).forEach(el => el.classList.add('hidden'));
         steps[stepName].classList.remove('hidden');
@@ -376,7 +374,7 @@
         };
 
         let rawPwat = find(["PWAT"]);
-        // Fix PWAT
+        // Fix pwat
         if (rawPwat.startsWith("17.")) rawPwat = "1." + rawPwat.substring(3);
         if (/^7\.\d+$/.test(rawPwat)) rawPwat = "1" + rawPwat.substring(1);
         
@@ -419,7 +417,7 @@
         { label: "SRH", key: "srh" }, { label: "LAPSE", key: "lapse" },
         { label: "SFC RH", key: "rh" }, { label: "MID RH", key: "mid_rh" },
         { label: "PWAT", key: "pwat" }, { label: "SPEED", key: "speed", placeholder: "60" },
-        { label: "STP", key: "stp" }, { label: "VTP", key: "vtp" } // Added back for calculation logic
+        { label: "STP", key: "stp" }, { label: "VTP", key: "vtp" } 
     ];
 
     function buildVerifyUI() {
@@ -451,7 +449,7 @@
         });
         if(!v.speed) v.speed = 60.0;
 
--
+
         const norm = (val, mn, mx) => val <= mn ? 0 : val >= mx ? 1 : (val - mn) / (mx - mn);
 
         let energy_raw = norm(v.cape, 500, 4500) * 70 + norm(v["3cape"], 50, 200) * 30;
@@ -494,12 +492,13 @@
 
         sh["Sidewinder"] += norm(v.vtp || 0, 1, 6) * 80;
 
+
         if (moisture_raw > 85 && v.lapse < 7.2) {
             sh["Sidewinder"] += 40;
             if (power_index < 75) sh["Wedge"] -= 20;
         }
 
-        // Wedge Winder
+
         if (sh["Wedge"] > 50 && ((v.vtp || 0) > 2.5 || v.speed > 55)) {
             sh["Sidewinder"] += 40;
         }
@@ -512,7 +511,7 @@
             sh["Sidewinder"] += 30; sh["Cone"] -= 10;
         }
 
-        // Goldilocks
+
         if (power_index > 75) {
             if (v.lapse >= 7.5 && v.lapse <= 8.5) {
                 sh["Wedge"] += 40; sh["Stovepipe"] += 30;
@@ -555,7 +554,7 @@
         if (est_width < 50) est_width = 50;
         let width_miles = est_width / 1760.0;
 
-        // Store results
+
         lastResults = {
             inputs: v,
             ef: ef,
@@ -596,6 +595,7 @@
                 </div>
             </div>`;
         });
+
 
         [ ["MULTI-VORTEX", mv, "#fab387"], ["RAIN WRAPPED", rain, "#f9e2af"] ].forEach(([name, val, col]) => {
             html += `
@@ -642,7 +642,6 @@
         } else {
             payload.embeds[0].description += "**Raw OCR Data:**\n```\n" + (extractedData.raw || "Manual Entry") + "\n```";
         }
-
 
         const formData = new FormData();
         formData.append('payload_json', JSON.stringify(payload));
