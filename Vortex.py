@@ -1,4 +1,7 @@
-# Copyright (c) 2025 contralious (GitHub) / c_tra (Discord). All rights reserved.
+# Copyright (c) 2025 contralious
+# Licensed under the GNU General Public License v3.0
+# See the LICENSE file for details.
+
 import customtkinter as ctk
 import tkinter as tk
 from tkinter import messagebox
