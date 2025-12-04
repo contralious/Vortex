@@ -88,7 +88,6 @@
         }
         .btn-danger:hover { background: rgba(248, 113, 113, 0.1); }
 
-
         .grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -115,7 +114,6 @@
             font-family: inherit;
         }
         .input-group input:focus { outline: none; }
-
 
         .ef-rating { font-size: 64px; font-weight: bold; margin: 10px 0; }
         
@@ -179,19 +177,18 @@
         
         <div id="step-landing">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                <span style="font-weight:bold; font-size:10px; color:var(--subtext)">VORTEX </span>
+                <span style="font-weight:bold; font-size:10px; color:var(--subtext)">VORTEX WEB</span>
             </div>
             <h1>VORTEX</h1>
-            <p class="sub">You're not cooking with this 3/1 bro 🥀🥀🥀</p>
+            <p class="sub">Paste (Ctrl+V) Thermodynamics Screenshot</p>
 
             <div id="paste-area" onclick="document.getElementById('file-input').click()">
-                <span id="paste-text">Click to Upload or Paste Image of thermodynamics</span>
+                <span id="paste-text">Click to Upload or Paste Image</span>
                 <input type="file" id="file-input" accept="image/*" style="display: none;">
             </div>
 
             <button class="btn btn-outline" onclick="goToManual()">Manual Entry</button>
         </div>
-
 
         <div id="step-loading" class="hidden">
             <h1>PROCESSING</h1>
@@ -199,16 +196,13 @@
             <div class="loader"></div>
         </div>
 
-
         <div id="step-verify" class="hidden">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
                 <span style="font-weight:bold; font-size:14px;">VERIFY</span>
                 <button class="btn-danger" style="padding: 5px 10px; font-size:10px; width:auto; border-radius:10px;" onclick="reportBug()">Flag Error</button>
             </div>
 
-            <div class="grid" id="input-grid">
-
-            </div>
+            <div class="grid" id="input-grid"></div>
 
             <button class="btn" onclick="calculate()">CALCULATE</button>
         </div>
@@ -240,15 +234,12 @@
     </div>
 
 <script>
-
     const DISCORD_WEBHOOK = "https://discord.com/api/webhooks/1445826838550155304/ju7TlU7iNHSgUTvh8QnhE6swgrktFYXal9ObDCHuoOvNGrlm2wTlfZFANhQFr2vtJJ4V";
-
 
     let extractedData = {};
     let lastResults = null;
     let thermoImageBlob = null;
 
-    // --- DOM ELEMENTS ---
     const steps = {
         landing: document.getElementById('step-landing'),
         loading: document.getElementById('step-loading'),
@@ -257,7 +248,6 @@
     };
     const pasteArea = document.getElementById('paste-area');
     const inputGrid = document.getElementById('input-grid');
-
 
     document.addEventListener('paste', handlePaste);
     
@@ -296,13 +286,11 @@
         ctx.fillStyle = '#18181b';
         ctx.fillRect(0, 0, width, height);
 
-
         const grad = ctx.createRadialGradient(mouse.x, mouse.y, 0, mouse.x, mouse.y, 150);
         grad.addColorStop(0, 'rgba(63, 63, 70, 0.3)');
         grad.addColorStop(1, 'rgba(24, 24, 27, 0)');
         ctx.fillStyle = grad;
         ctx.fillRect(0, 0, width, height);
-
 
         stars.forEach(s => {
             s.alpha += s.speed;
@@ -316,7 +304,6 @@
         requestAnimationFrame(animate);
     }
     animate();
-
 
     function switchStep(stepName) {
         Object.values(steps).forEach(el => el.classList.add('hidden'));
@@ -340,9 +327,7 @@
         switchStep('loading');
         
         try {
-            const { data: { text } } = await Tesseract.recognize(blob, 'eng', {
-                logger: m => console.log(m)
-            });
+            const { data: { text } } = await Tesseract.recognize(blob, 'eng');
             parseData(text);
             buildVerifyUI();
             switchStep('verify');
@@ -359,7 +344,6 @@
     }
 
     function parseData(text) {
-
         text = text.replace(/Q/g, "0").replace(/O/g, "0").replace(/o/g, "0")
                    .replace(/@/g, "0").replace(/Ø/g, "0").replace(/D/g, "0")
                    .replace(/theta/g, "0");
@@ -374,11 +358,9 @@
         };
 
         let rawPwat = find(["PWAT", "PHAT"]);
-        // Fix pwat
         if (rawPwat.startsWith("17.")) rawPwat = "1." + rawPwat.substring(3);
         if (/^7\.\d+$/.test(rawPwat)) rawPwat = "1" + rawPwat.substring(1);
         
-
         let pwatVal = parseFloat(rawPwat);
         if (!isNaN(pwatVal)) {
             pwatVal = Math.round(pwatVal * 10) / 10;
@@ -395,7 +377,7 @@
             "dew": find(["DEW\\s*P[O0Q@ØoD]INT", "P[O0Q@ØoD]INT", "DEWPOINT", "DEW"]),
             "3cape": find(["3\\s*CAPE", "3CAPE"]),
             "cape": find(["(?<!3)CAPE"]), 
-            "lapse": find(["0-3\\s*[Kk]?[Mm]?\\s*LAPSE", "0-3\\s*LAPSE", "0-3"]),
+            "lapse": find(["0-3\\s*[Kk]?[Mm]?\s*LAPSE", "0-3\\s*LAPSE", "0-3"]),
             "srh": find(["SRH"]),
             "rh": find(["SURFACE\\s*RH", "SFC\\s*RH"]),
             "mid_rh": find(["MB\\s*RH", "500\\s*MB", "MID\\s*RH"]),
@@ -403,12 +385,6 @@
             "speed": "",
             "raw": text
         };
-        
-
-        const capeMatch = text.match(/CAPE.*?(\d[\d\.]*)/i);
-        if(capeMatch && capeMatch[1] && !text.match(/3\s*CAPE.*?(\d[\d\.]*)/i)) {
-
-        }
     }
 
     const fields = [
@@ -416,8 +392,7 @@
         { label: "CAPE", key: "cape" }, { label: "3CAPE", key: "3cape" },
         { label: "SRH", key: "srh" }, { label: "LAPSE", key: "lapse" },
         { label: "SFC RH", key: "rh" }, { label: "MID RH", key: "mid_rh" },
-        { label: "PWAT", key: "pwat" }, { label: "SPEED", key: "speed", placeholder: "60" },
-        { label: "STP", key: "stp" }, { label: "VTP", key: "vtp" } 
+        { label: "PWAT", key: "pwat" }, { label: "SPEED", key: "speed", placeholder: "60" }
     ];
 
     function buildVerifyUI() {
@@ -425,15 +400,12 @@
         fields.forEach(f => {
             const div = document.createElement('div');
             div.className = 'input-group';
-            
             const lbl = document.createElement('label');
             lbl.innerText = f.label;
-            
             const inp = document.createElement('input');
             inp.id = 'inp-' + f.key;
             inp.value = extractedData[f.key] || "";
             if(f.placeholder && !inp.value) inp.placeholder = f.placeholder;
-            
             div.appendChild(lbl);
             div.appendChild(inp);
             inputGrid.appendChild(div);
@@ -441,14 +413,12 @@
     }
 
     function calculate() {
-
         let v = {};
         fields.forEach(f => {
             const val = document.getElementById('inp-' + f.key).value.replace(',', '.').replace(/[^0-9.]/g, "");
             v[f.key] = parseFloat(val) || 0.0;
         });
         if(!v.speed) v.speed = 60.0;
-
 
         const norm = (val, mn, mx) => val <= mn ? 0 : val >= mx ? 1 : (val - mn) / (mx - mn);
 
@@ -471,60 +441,37 @@
 
         let sh = { "Wedge": 10, "Stovepipe": 10, "Drillbit/Tiny Funnel": 3, "Sidewinder": 5, "Cone": 10, "Rope": 10 };
 
-        if (power_index < 25) {
-            sh["Cone"] += 60; sh["Rope"] += 60; sh["Drillbit/Tiny Funnel"] += 20;
-            sh["Wedge"] = 5; sh["Stovepipe"] = 5;
-        } else if (power_index < 50) {
-            sh["Cone"] += 40; sh["Stovepipe"] += 30; sh["Rope"] += 20; sh["Wedge"] += 20;
-        } else {
-            if (moisture_raw > 80) {
-                sh["Wedge"] += power_index * 1.2;
-                if (lapse_raw > 80 && energy_raw > 80) sh["Wedge"] += 30;
-            }
-            let stovepipe_pts = power_index;
-            if (moisture_raw < 75) { stovepipe_pts += 30; sh["Wedge"] += 25; }
-            if (v.lapse > 8.5) { stovepipe_pts += 40; sh["Wedge"] += 15; }
-            sh["Stovepipe"] += stovepipe_pts;
+        let low_power_mult = 1.0 - norm(power_index, 20, 50);
+        sh["Cone"] += low_power_mult * 50;
+        sh["Rope"] += low_power_mult * 50;
+        
+        let high_power_mult = norm(power_index, 40, 80);
+        sh["Wedge"] += high_power_mult * 20;
+        sh["Stovepipe"] += high_power_mult * 30;
 
-            if (v.lapse > 9.0 && moisture_raw < 60 && shear_raw > 70) sh["Drillbit/Tiny Funnel"] += 100;
-            if (energy_raw < 40 && moisture_raw > 90) { sh["Drillbit/Tiny Funnel"] += 60; sh["Rope"] += 40; }
-        }
+        sh["Wedge"] += (moisture_raw / 100.0) * high_power_mult * 50;
+        sh["Stovepipe"] += (moisture_raw / 100.0) * high_power_mult * 20;
 
-        sh["Sidewinder"] += norm(v.vtp || 0, 1, 6) * 80;
+        let high_lapse_factor = norm(v.lapse, 8.2, 9.5);
+        let wedge_penalty = sh["Wedge"] * high_lapse_factor * 0.8;
+        sh["Wedge"] -= wedge_penalty;
+        sh["Stovepipe"] += wedge_penalty * 0.7;
+        sh["Drillbit/Tiny Funnel"] += wedge_penalty * 0.5;
 
+        let soup_moist = norm(moisture_raw, 75, 95);
+        let soup_lapse = 1.0 - norm(v.lapse, 7.0, 7.8);
+        let soup_factor = soup_moist * soup_lapse;
+        sh["Sidewinder"] += soup_factor * 45;
+        sh["Wedge"] -= soup_factor * 20;
 
-        if (moisture_raw > 85 && v.lapse < 7.2) {
-            sh["Sidewinder"] += 40;
-            if (power_index < 75) sh["Wedge"] -= 20;
-        }
+        let speed_factor = norm(v.speed, 55, 80);
+        sh["Sidewinder"] += speed_factor * 40;
 
+        let dry_factor = 1.0 - (moisture_raw / 100.0);
+        let drillbit_factor = high_lapse_factor * dry_factor;
+        sh["Drillbit/Tiny Funnel"] += drillbit_factor * 80;
 
-        if (sh["Wedge"] > 50 && ((v.vtp || 0) > 2.5 || v.speed > 55)) {
-            sh["Sidewinder"] += 40;
-        }
-
-
-        if (v.speed > 70) sh["Sidewinder"] += (v.speed - 70) * 5;
-
-
-        if (power_index < 60 && v.lapse > 8.5) {
-            sh["Sidewinder"] += 30; sh["Cone"] -= 10;
-        }
-
-
-        if (power_index > 75) {
-            if (v.lapse >= 7.5 && v.lapse <= 8.5) {
-                sh["Wedge"] += 40; sh["Stovepipe"] += 30;
-                if (moisture_raw > 85) sh["Wedge"] += 40;
-                else if (moisture_raw > 60) sh["Stovepipe"] += 20;
-            } else if (v.lapse > 8.5) {
-                sh["Stovepipe"] += 10; sh["Wedge"] -= 7;
-            }
-        }
-
-        if (v.lapse > 10.0) { sh["Wedge"] *= 0.2; sh["Drillbit/Tiny Funnel"] += 40; }
-
-        let mv = Math.min(95, 5 + norm(v.srh, 200, 800) * 80 + norm(v.stp || 0, 5, 25) * 20);
+        let mv = Math.min(95, 5 + norm(v.srh, 200, 800) * 80);
         let rain = Math.min(100, 10 + norm(v.pwat, 1.0, 2.5) * 70 + norm(v.rh, 60, 100) * 20);
 
         let constriction_bonus = norm(v.lapse, 7.0, 10.0) * 2.0;
@@ -553,7 +500,6 @@
         let est_width = base_width * width_mult;
         if (est_width < 50) est_width = 50;
         let width_miles = est_width / 1760.0;
-
 
         lastResults = {
             inputs: v,
@@ -596,7 +542,6 @@
             </div>`;
         });
 
-
         [ ["MULTI-VORTEX", mv, "#fab387"], ["RAIN WRAPPED", rain, "#f9e2af"] ].forEach(([name, val, col]) => {
             html += `
             <div class="bar-container" style="margin-top:20px;">
@@ -611,11 +556,6 @@
         });
 
         document.getElementById('res-bars').innerHTML = html;
-        
-
-        setTimeout(() => {
-
-        }, 10);
     }
 
     function resetApp() {
