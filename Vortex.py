@@ -17,7 +17,7 @@ import math
 from io import BytesIO
 
 
-DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1445398516338786345/Uvs3AcMz7tCGdyAo7Wr-pbGNpt-z7nlq3gJsMjctSQ_DmHBdV9IkMPmzmzaOWyHDgI2X" 
+DISCORD_WEBHOOK_URL = "x" 
 CONFIG_FILE = "config.json"
 
 
