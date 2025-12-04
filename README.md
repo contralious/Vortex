@@ -9,4 +9,6 @@ Why is it 451MB?
 It uses tesseract OCR, which takes up a lot of space (I need to pack it into the program so it works for everyone with a single download)
 
 
-MADE BY @c_tra on discord.
+MADE BY @c_tra on discord,
+© 2025 contralious — All rights reserved.
+Unauthorized copying or reuse is prohibited.
