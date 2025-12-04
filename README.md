@@ -6,7 +6,7 @@ make sure you crop thermodynamics EXACTLY as shown as in video. its possible for
 https://files.catbox.moe/rpk1ic.mp4
 
 Why is it 451MB?
-It uses tesseract OCR, which takes up a lot of space (i need to pack it into the program so it works for everyone with a single download)
+It uses tesseract OCR, which takes up a lot of space (I need to pack it into the program so it works for everyone with a single download)
 
 
-MADE BY @C_tra on discord.
+MADE BY @c_tra on discord.
