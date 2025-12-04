@@ -11,5 +11,7 @@ It uses tesseract OCR, which takes up a lot of space (I need to pack it into the
 
 
 MADE BY @c_tra on discord,
-© 2025 contralious - All rights reserved.
-Unauthorized copying or reuse is prohibited.
+Copyright (c) 2025 contralious
+
+Permission is granted to view and use this code for learning or personal use.
+Commercial use, redistribution, or modified releases require explicit permission.
