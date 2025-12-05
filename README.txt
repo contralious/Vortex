@@ -1,5 +1,6 @@
 DISCLAIMER: THIS MAY OR MAY NOT BE ALWAYS ACCURATE, YOURE PREDICTING A DICEROLL.
-= Didn't know i'd have to say this, but for the love of GOD, it doesn't MAGICALLY PREDICT WHAT TORNADOES WILL APPEAR WITH 100% ACCURACY. It's not MAGIC. The entire point of this is to read the THERMODYNAMICS FOR YOU, and TELL YOU what is MOST LIKELY to HAPPEN (based on over 50 recorded days ranging from high to slgt risks). There's NO WAY FOR IT TO BE PERFECTLY ACCURATE.
+= Didn't know i'd have to say this, but for the love of GOD, it doesn't MAGICALLY PREDICT WHAT TORNADOES WILL APPEAR WITH 100% ACCURACY. It's not MAGIC. The entire point of this is to read the THERMODYNAMICS for you (on a higher and more precise level than most people can), and TELL YOU what is MOST LIKELY to HAPPEN (based on over 50 recorded days ranging from high to slgt risks). There's NO WAY FOR IT TO BE PERFECTLY ACCURATE.
+PLUS. This is a PRE RELEASE.
 
 
 HOW TO DOWNLOAD?
