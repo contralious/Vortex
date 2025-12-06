@@ -352,95 +352,109 @@ calculate() {
         
         const norm = (val, mn, mx) => val <= mn ? 0 : val >= mx ? 1 : (val - mn) / (mx - mn);
         
-
         let energy_raw = norm(v.cape, 500, 5000) * 80 + norm(v["3cape"], 50, 300) * 20;
         let shear_raw = norm(v.srh, 100, 800) * 85 + norm(v.speed, 30, 90) * 15;
         let spread = v.temp - v.dew;
         let moisture_raw = ((1.0 - norm(spread, 0, 20)) * 40) + (norm(v.rh, 40, 100) * 40) + (norm(v.mid_rh, 30, 90) * 20);
         let moisture_wedge_factor = Math.pow(moisture_raw / 100, 2) * 100;
         
-
-        let lapse_raw = 0;
-        if (v.lapse >= 6.0 && v.lapse < 7.5) lapse_raw = norm(v.lapse, 6.0, 7.5) * 80; 
-        else if (v.lapse >= 7.5 && v.lapse <= 8.8) lapse_raw = 100; 
-        else if (v.lapse > 8.8) lapse_raw = 100 - (norm(v.lapse, 8.8, 11.0) * 50);
+        let lapse_up = norm(v.lapse, 6.0, 7.5);
+        let lapse_down = 1.0 - norm(v.lapse, 8.8, 10.5); 
+        let lapse_score = lapse_up * lapse_down * 100;
+        let lapse_plateau = norm(v.lapse, 7.5, 8.8); 
+        if (lapse_plateau > 0 && lapse_plateau < 1) lapse_score = 100; 
         
         let power_index = (energy_raw * 0.6) + (shear_raw * 0.4);
         let sh = { "Wedge": 0, "Stovepipe": 0, "Drillbit/Tiny Funnel": 0, "Sidewinder": 0, "Cone": 0, "Rope": 0 };
         
+        let low_tier_mix = 1.0 - norm(power_index, 25, 55);
+        let mid_tier_mix = norm(power_index, 25, 55) * (1.0 - norm(power_index, 60, 80));
+        let high_tier_mix = norm(power_index, 60, 90);
 
-        let low_power_mult = 1.0 - norm(power_index, 20, 50); 
-        sh["Cone"] += low_power_mult * 50; 
-        sh["Rope"] += low_power_mult * 50;
+        sh["Cone"] += low_tier_mix * 40 + mid_tier_mix * 60;
+        sh["Rope"] += low_tier_mix * 50;
+        sh["Drillbit/Tiny Funnel"] += low_tier_mix * 20;
 
-        sh["Drillbit/Tiny Funnel"] += low_power_mult * 20; 
+        sh["Stovepipe"] += mid_tier_mix * 30 + high_tier_mix * 30;
+        sh["Wedge"] += high_tier_mix * 15;
 
-        let mid_power_cone = norm(power_index, 20, 40) * (1.0 - norm(power_index, 50, 70)); 
-        sh["Cone"] += mid_power_cone * 60;
-        sh["Stovepipe"] += norm(power_index, 35, 70) * 35;
-        
-        let high_power_mult = norm(power_index, 60, 90); 
-        sh["Wedge"] += high_power_mult * 15; 
-        sh["Stovepipe"] += high_power_mult * 30;
-        
         let raw_energy_boost = norm(v.cape, 5000, 12000) * 35; 
         sh["Wedge"] += raw_energy_boost;
         
-        sh["Wedge"] += (moisture_wedge_factor / 100.0) * high_power_mult * 70; 
-        sh["Stovepipe"] += (moisture_raw / 100.0) * high_power_mult * 40;
+        sh["Wedge"] += (moisture_wedge_factor / 100.0) * high_tier_mix * 70; 
+        sh["Stovepipe"] += (moisture_raw / 100.0) * high_tier_mix * 40;
         
+        let constriction_force = norm(power_index, 60, 75) * (1.0 - norm(moisture_raw, 65, 75));
+        sh["Stovepipe"] += constriction_force * 25;
+        sh["Cone"] *= (1.0 - (constriction_force * 0.5));
 
-        if (power_index > 65 && moisture_raw < 75) { sh["Stovepipe"] += 25; sh["Cone"] *= 0.5; }
-        
         let high_lapse_factor = norm(v.lapse, 8.2, 9.5);
         let wedge_penalty = sh["Wedge"] * high_lapse_factor * 0.8;
         
-
-        if (v.cape > 8000) { wedge_penalty = 0; sh["Wedge"] += 80; sh["Stovepipe"] += 80; sh["Cone"] = 0; sh["Sidewinder"] *= 0.5; }
+        let nuclear_factor = norm(v.cape, 7500, 9000);
         
+        wedge_penalty *= (1.0 - nuclear_factor); 
+        sh["Wedge"] += nuclear_factor * 80;
+        sh["Stovepipe"] += nuclear_factor * 80;
+        sh["Cone"] *= (1.0 - nuclear_factor); 
+        sh["Sidewinder"] *= (1.0 - (nuclear_factor * 0.5));
+
         sh["Wedge"] -= wedge_penalty; 
         sh["Stovepipe"] += wedge_penalty * 0.7; 
         sh["Drillbit/Tiny Funnel"] += wedge_penalty * 0.5;
-
+        
         let soup_factor = norm(moisture_raw, 75, 95) * (1.0 - norm(v.lapse, 7.0, 7.8)); 
         sh["Sidewinder"] += soup_factor * 45; 
         sh["Wedge"] -= soup_factor * 20;
-        sh["Sidewinder"] += norm(v.speed, 55, 80) * 40;
-        if (v.lapse > 8.8 && v.speed > 68) { sh["Sidewinder"] += 50; sh["Stovepipe"] -= 30; }
         
+        sh["Sidewinder"] += norm(v.speed, 55, 80) * 40;
+        
+        let chaos_factor = norm(v.lapse, 8.5, 9.2) * norm(v.speed, 65, 75);
+        sh["Sidewinder"] += chaos_factor * 50;
+        sh["Stovepipe"] -= chaos_factor * 30;
 
         let dry_factor = 1.0 - (moisture_raw / 100.0); 
-        if (power_index < 40) sh["Drillbit/Tiny Funnel"] += (high_lapse_factor * dry_factor) * 80;
-        
+        let weak_storm_factor = 1.0 - norm(power_index, 35, 50);
+        sh["Drillbit/Tiny Funnel"] += (high_lapse_factor * dry_factor * weak_storm_factor) * 80;
 
-        if (v.srh > 700 && moisture_raw > 80 && v.lapse < 6.0) { sh["Wedge"] += 50; sh["Stovepipe"] += 20; }
-        if (power_index > 80 && v.lapse > 8.5) sh["Wedge"] += 20;
-        if (sh["Wedge"] > 50 && v.speed > 70) sh["Sidewinder"] += 40;
-        if (v.speed > 70) sh["Sidewinder"] += (v.speed - 70) * 5;
-        if (sh["Wedge"] > 40 || sh["Stovepipe"] > 40) sh["Cone"] *= 0.2;
-        if (v.cape > 4500) sh["Cone"] *= 0.1;
-        
-        if (v.srh < 250) { 
-            sh["Wedge"] *= 0.2; 
-            sh["Stovepipe"] *= 0.4; 
-            sh["Cone"] += 60; 
-            sh["Rope"] += 40; 
-            sh["Sidewinder"] *= 0.5; 
-            sh["Drillbit/Tiny Funnel"] += 25; 
-        }
+        let shear_rescue = norm(v.srh, 650, 750) * norm(moisture_raw, 75, 85) * (1.0 - norm(v.lapse, 5.8, 6.5));
+        sh["Wedge"] += shear_rescue * 50;
+        sh["Stovepipe"] += shear_rescue * 20;
 
-        if (sh["Rope"] > 0) {
-            sh["Drillbit/Tiny Funnel"] += sh["Rope"] * 0.3;
-        }
+        let power_lapse_boost = norm(power_index, 75, 85) * norm(v.lapse, 8.4, 9.0);
+        sh["Wedge"] += power_lapse_boost * 20;
+
+        let speed_kill = norm(v.speed, 70, 85);
+        let wedge_dominance = norm(sh["Wedge"], 40, 60);
+        sh["Sidewinder"] += speed_kill * wedge_dominance * 40;
+        sh["Sidewinder"] += speed_kill * 20;
+
+        let shape_suppress = norm(Math.max(sh["Wedge"], sh["Stovepipe"]), 30, 50);
+        sh["Cone"] *= (1.0 - (shape_suppress * 0.8));
+        sh["Cone"] *= (1.0 - norm(v.cape, 4000, 5000) * 0.9);
+
+        let shear_safety = norm(v.srh, 100, 350);
+        let shear_penalty_mult = 0.25 + (0.75 * shear_safety);
+        let shear_fail_add = 1.0 - shear_safety;
+
+        sh["Wedge"] *= shear_penalty_mult;
+        sh["Stovepipe"] *= (0.4 + (0.6 * shear_safety));
+        sh["Sidewinder"] *= (0.5 + (0.5 * shear_safety)); 
+        
+        sh["Cone"] += shear_fail_add * 60;
+        sh["Rope"] += shear_fail_add * 40;
+        sh["Drillbit/Tiny Funnel"] += shear_fail_add * 25;
+
+        sh["Drillbit/Tiny Funnel"] += sh["Rope"] * 0.3;
 
         Object.keys(sh).forEach(k => { if(sh[k] < 0) sh[k] = 0; });
         
         let mv = Math.min(95, 5 + norm(v.srh, 200, 800) * 80);
         let rain = Math.min(100, 10 + norm(v.pwat, 1.0, 2.5) * 70 + norm(v.rh, 60, 100) * 20);
         
-        let ef_score = ((v.cape * v.srh) / 150000 + (norm(v.lapse, 7.0, 10.0) * 2.0));
-        if (v.srh < 250) ef_score *= 0.5;
-        
+        let ef_raw = ((v.cape * v.srh) / 150000 + (norm(v.lapse, 7.0, 10.0) * 2.0));
+        let ef_score = ef_raw * (0.5 + (0.5 * shear_safety));
+
         let ef = "EF0"; 
         if (ef_score > 1.5) ef = "EF1"; 
         if (ef_score > 3.0) ef = "EF2"; 
