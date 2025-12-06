@@ -319,7 +319,6 @@ class StormOverlay(ctk.CTk):
                                    fg_color="transparent", border_width=1, border_color=COLORS["subtext"], text_color=COLORS["text"],
                                    hover_color=COLORS["panel"], command=lambda: SnippingTool(self, self.handle_comp))
         self.btn_c.grid(row=0, column=1, padx=5)
-        # ----------------------------------
 
         self.btn_go = ctk.CTkButton(self.canvas, text="PROCESS", width=170, height=40, corner_radius=20,
                                     fg_color=COLORS["accent"], text_color="#1a1a1a", hover_color=COLORS["accent_hover"],
@@ -393,10 +392,10 @@ class StormOverlay(ctk.CTk):
 
     def show_verify(self):
         self.clear_ui()
-        self.smooth_transition(400, 680) # Taller for textbox
+        self.smooth_transition(400, 680) 
         self.canvas.create_text(20, 20, text="VERIFY", font=("Helvetica", 14, "bold"), fill="white", anchor="nw", tags="ui")
         
-        # --- feedback ---
+        # feedback 
         self.canvas.create_text(20, 50, text="REPORTING", font=("Helvetica", 10, "bold"), fill=COLORS["subtext"], anchor="nw", tags="ui")
 
         self.report_box = ctk.CTkTextbox(self.canvas, width=360, height=60, corner_radius=8, 
@@ -409,7 +408,6 @@ class StormOverlay(ctk.CTk):
                        text_color=COLORS["danger"], hover_color=COLORS["bg"], width=100, height=24, corner_radius=12,
                        command=self.send_user_report)
         self.canvas.create_window(340, 58, window=btn_flag, tags="ui")
-        # ------------------------
 
         grid_frame = ctk.CTkFrame(self.canvas, fg_color="transparent", width=360)
         self.canvas.create_window(200, 360, window=grid_frame, tags="ui")
@@ -451,16 +449,14 @@ class StormOverlay(ctk.CTk):
         """Actual logic for sending data and message to Discord."""
         try:
             files = {}
-            # 1. Prepare images
             for name, img in [("t.png", self.thermo_img), ("c.png", self.comp_img)]:
                 b = BytesIO(); img.save(b, "PNG"); b.seek(0)
                 files[name] = (name, b, "image/png")
                 
-            # 2. Prepare webhook content
             embeds = [{
                 "title": "VORTEX OCR Error Report",
                 "description": f"**User Feedback:**\n> {message}\n\n**Raw OCR Data:**\n```\n{self.extracted_data.get('raw', 'N/A')[:1000]}```",
-                "color": 16777215 # White
+                "color": 16777215 
             }]
             
             payload = {"embeds": embeds}
